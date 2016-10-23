@@ -68,8 +68,8 @@ a.local-game {
     display: flex;
     flex-direction: row;
     margin: auto;
-    width: 30vw;
-    height: 30vw;
+    width: 75vh;
+    height: 75vh;
     max-width: 1200px;
     background-color: #a3abb6;
     border: 10px solid #555;
@@ -170,13 +170,12 @@ a.local-game {
 
     .board-container {
         padding: 5px 5px 20px 5px;
-        flex-grow: 0;
     }
 
     .chat-container {
         height: 120px;
         width: 100%;
-        flex-grow: 1;
+        flex-shrink: 0;
     }
 
     #chat-status {
@@ -185,7 +184,8 @@ a.local-game {
     }
 
     .checker-board {
-        width: 90vw;
+        width: 65vh;
+        height: 65vh;
     }
 }
 
