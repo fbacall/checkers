@@ -194,19 +194,18 @@ Checkers.prototype.movePiece = function (piece, destCol, destRow) {
     piece.column = destCol;
     piece.row = destRow;
     this.board[piece.column][piece.row] = piece;
+
+    if (destRow === 0 || destRow === (this.size - 1))
+        piece.king = true;
 };
 
 Checkers.prototype.jumpPiece = function (piece, destCol, destRow) {
-    this.board[piece.column][piece.row] = null;
     var jumpedCol = (piece.column + destCol) / 2;
     var jumpedRow = (piece.row + destRow) / 2;
-    piece.column = destCol;
-    piece.row = destRow;
-    this.board[piece.column][piece.row] = piece;
-
     console.log('jumped', jumpedCol, jumpedRow);
-
     this.removePiece(this.board[jumpedCol][jumpedRow]);
+
+    this.movePiece(piece, destCol, destRow);
 };
 
 function Piece (column, row, player, game) {
