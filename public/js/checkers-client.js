@@ -16,7 +16,7 @@ function drawGame (board, element) {
     for (let col = 0; col < board.length; col++) {
         for (let row = 0; row < board[col].length; row++) {
             if (board[col][row]) {
-                var el = element.find(`.column:eq(${col}) .cell:eq(${row})`)
+                var el = element.find(`.column:eq(${col}) .cell:eq(${row})`);
                 el.addClass(`player-${board[col][row].player}`);
                 if (board[col][row].king) {
                     el.addClass(`king`);
@@ -65,7 +65,7 @@ function connect () {
         }
         drawGame(game.board, $('#board'));
         if (game.state === 'won') {
-            $('#status').html(`${playerName(game.turn)} wins!`);
+            $('#status').html(`${playerName(game.winner)} wins!`);
         } else if (game.state === 'draw') {
             $('#status').html('Draw!');
         } else if (game.state === 'waiting') {
