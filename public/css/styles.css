@@ -1,0 +1,191 @@
+/* colour: #202b41 */
+
+html {
+    height: 100%;
+    position: relative;
+}
+body {
+    font-family: sans-serif;
+    height: 100%;
+}
+
+.jumbotron {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#recent-results, #local-games {
+    font-size: larger;
+}
+
+a.local-game {
+
+}
+
+.small-board {
+    float: left;
+    margin: 5px;
+    width: 215px;
+}
+
+.small-board .checker-board {
+    width: 100px;
+    height: 75px;
+    border-radius: 2px;
+    border-width: 0 2px;
+}
+
+.small-board .checker-board .column {
+    border-width: 2px 0;
+}
+
+.small-board .checker-board .column:hover {
+    background-color: inherit;
+}
+
+.game-container {
+    display: flex;
+    height: 100%;
+    background-color: #dae0e8;
+}
+
+.board-container {
+    padding: 10px 50px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.chat-container {
+    flex-shrink: 0;
+    width: 300px;
+    position: relative;
+    background-color: #cad2dd;
+    display: flex;
+    flex-direction: column;
+}
+
+.checker-board {
+    display: flex;
+    flex-direction: row;
+    margin: auto;
+    width: 35vw;
+    height: 35vw;
+    max-width: 1200px;
+    background-color: #a3abb6;
+    border: 10px solid #555;
+}
+
+.column {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-grow: 1;
+}
+
+.column:hover {
+    background-color: #fff;
+}
+
+.cell {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.column:nth-child(even) .cell:nth-child(even),
+.column:nth-child(odd) .cell:nth-child(odd){
+    background-color: #333;
+}
+.column:nth-child(odd) .cell:nth-child(even),
+.column:nth-child(even) .cell:nth-child(odd){
+    background-color: #EEE;
+}
+
+.cell.player-1 {
+    background-image: url('../images/player1-man.png');
+    background-position: center center;
+    background-size: 100% 100%;
+}
+
+.cell.player-2 {
+    background-image: url('../images/player2-man.png');
+    background-position: center center;
+    background-size: 100% 100%;
+}
+
+.cell.player-1.king {
+    background-image: url('../images/player1-king.png');
+}
+
+.cell.player-2.king {
+    background-image: url('../images/player2-king.png');
+}
+
+
+#status {
+    margin: auto;
+    font-size: large;
+    font-weight: bold;
+}
+
+.player-1 {
+    color: #e81216;
+}
+
+.player-2 {
+    color: #e5ac49;
+}
+
+#chat {
+    padding: 5px;
+    flex-grow: 1;
+    overflow-y: scroll;
+}
+
+#chat-status {
+    background-color: #a3abb6;
+    padding: 5px;
+}
+
+#chat-input {
+    flex-shrink: 0;
+    padding: 10px;
+    border: none;
+    background-color: white;
+}
+
+.player-name {
+    font-weight: bold;
+}
+
+.chat-status {
+    font-style: italic;
+}
+
+@media only screen and (max-width : 768px) {
+    .game-container {
+        flex-direction: column;
+    }
+
+    .board-container {
+        padding: 5px 5px 20px 5px;
+        flex-grow: 0;
+    }
+
+    .chat-container {
+        height: 120px;
+        width: 100%;
+        flex-grow: 1;
+    }
+
+    #chat-status {
+        position: absolute;
+        right: 0;
+    }
+
+    .checker-board {
+        width: 90vw;
+    }
+}
+
+#options {
+    margin-top: 1em;
+}
