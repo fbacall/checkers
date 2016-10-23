@@ -119,6 +119,9 @@ a.local-game {
     background-image: url('../images/player2-king.png');
 }
 
+.cell.selected {
+    background-color: #366486 !important;
+}
 
 #status {
     margin: auto;

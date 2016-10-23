@@ -1,12 +1,10 @@
 var socket;
 var id;
 
-function drawBoard (element, cols, rows) {
-    cols = cols || 7;
-    rows = rows || 6;
-    for (let col = 0; col < cols; col++) {
+function drawBoard (element, size) {
+    for (let col = 0; col < size; col++) {
         var html = '<div class="column">';
-        for (let row = 0; row < rows; row++) {
+        for (let row = 0; row < size; row++) {
             html += '<div class="cell"></div>';
         }
         element.append(html + '</div>');
@@ -14,17 +12,18 @@ function drawBoard (element, cols, rows) {
 }
 
 function drawGame (board, element) {
+    element.find('.cell').removeClass('player-1 player-2 king');
     for (let col = 0; col < board.length; col++) {
         for (let row = 0; row < board[col].length; row++) {
-            element.find(`.column:eq(${col}) .cell:eq(${row})`).addClass(`player-${board[col][row]}`);
+            if (board[col][row]) {
+                var el = element.find(`.column:eq(${col}) .cell:eq(${row})`)
+                el.addClass(`player-${board[col][row].player}`);
+                if (board[col][row].king) {
+                    el.addClass(`king`);
+                }
+            }
         }
     }
-}
-
-function highlightWinningCells (winning, element) {
-    winning.forEach((c) => {
-        element.find(`.column:eq(${c[0]}) .cell:eq(${c[1]})`).addClass('winning');
-    });
 }
 
 function playerName (player) {
@@ -42,6 +41,7 @@ function connect () {
     socket = io.connect('', {query: 'name=' + name + '&id=' + id});
 
     socket.on('player-number', function (number) {
+        player = number;
         $('#player').text(`You are player ${number}`).addClass(`player-${number}`)
     });
 
@@ -60,13 +60,12 @@ function connect () {
     socket.on('state', function (game) {
         console.log(game);
         if (!$('#board').children().length) {
-            drawBoard($('#board'), game.columns, game.rows);
+            drawBoard($('#board'), game.size);
             $('#numToWin').text(game.toWin);
         }
         drawGame(game.board, $('#board'));
         if (game.state === 'won') {
             $('#status').html(`${playerName(game.turn)} wins!`);
-            highlightWinningCells(game.winning, $('#board'));
         } else if (game.state === 'draw') {
             $('#status').html('Draw!');
         } else if (game.state === 'waiting') {
@@ -81,6 +80,10 @@ function connect () {
     $('#name-modal').modal('hide');
 }
 
+var player;
+var pieceCol;
+var pieceRow;
+
 $(document).ready(function () {
     var match = location.href.match(/\/game\/([a-z0-9]+)/);
     if (match) {
@@ -94,8 +97,18 @@ $(document).ready(function () {
             }
         });
 
-        $('#board').on('click','.column', function () {
-            socket.emit('place-token', $(this).index());
+        $('#board').on('click','.cell', function () {
+            var row = $(this).index();
+            var col = $(this).parent('.column').index();
+            $('.cell.selected').removeClass('selected');
+
+            if ($(this).hasClass('player-' + player)) {
+                pieceRow = row;
+                pieceCol = col;
+                $(this).addClass('selected');
+            } else {
+                socket.emit('move', pieceCol, pieceRow, col, row);
+            }
         });
 
         $('#chat-input').keyup(function (e) {
