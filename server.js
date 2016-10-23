@@ -101,8 +101,13 @@ io.on('connection', function(socket){
             game.addPlayer(player);
             socket.emit('player-number', player.number);
 
-            socket.on('place-token', function(pieceCol, pieceRow, destCol, destRow) {
+            socket.on('move', function(pieceCol, pieceRow, destCol, destRow) {
+                console.log('hey');
+                console.log(player.number);
+                console.log(game.turn.number);
+                console.log(game.turn === player);
                 if (game.turn === player) {
+                    console.log('yo');
                     game.move(pieceCol, pieceRow, destCol, destRow);
                     if (game.state === 'won') {
                         room.status(game.winner, 'wins!');

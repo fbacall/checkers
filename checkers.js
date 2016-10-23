@@ -54,7 +54,7 @@ Checkers.prototype.start = function () {
             if (evenCol && evenRow || !evenCol && !evenRow) {
                 this.addPiece(new Piece(i, j, 1, this));
             } else {
-                this.addPiece(new Piece(i, col.length - (j + 1), 2, this));
+                this.addPiece(new Piece(i, this.size - (j + 1), 2, this));
             }
         }
     }
@@ -65,20 +65,29 @@ Checkers.prototype.start = function () {
 };
 
 Checkers.prototype.move = function (pieceCol, pieceRow, destCol, destRow) {
+    console.log('a');
     if (this.player1 && this.player2) {
+        console.log('b');
         var piece = this.board[pieceCol][pieceRow];
-        if (piece && piece.player === this.turn) {
+        if (piece && piece.player === this.turn.number) {
+            console.log('c');
             var validMoves = piece.validMoves();
+            console.log('valid moves', validMoves);
+            console.log('attempting to jump to', this.board[destCol][destRow]);
             // Must jump if available!
-            if (validMoves.jumps.length) {
+            if (this.checkCanJump()) {
+                console.log('d');
                 if (this.validJump(piece, destCol, destRow)) {
+                    console.log('g');
                     this.jumpPiece(piece, destCol, destRow);
                     if (!piece.validMoves().jumps.length) {
                         this.switchPlayer();
                     }
                 }
             } else if (validMoves.moves.length) {
+                console.log('e');
                 if (this.validMove(piece, destCol, destRow)) {
+                    console.log('f');
                     this.movePiece(piece, destCol, destRow);
                     this.switchPlayer();
                 }
@@ -116,7 +125,9 @@ Checkers.prototype.getState = function () {
       state: this.state,
       winner: this.winner,
       turn: this.turn,
-      board: this.board,
+      board: this.board.map(function (col) {
+          return col.map(function (piece) { return piece ? { player: piece.player, king: piece.king } : {} });
+      }),
       size: this.size,
       rows: this.rows
   };
@@ -136,12 +147,26 @@ Checkers.prototype.removePiece = function (piece) {
     }
 };
 
+Checkers.prototype.checkCanJump = function () {
+    var pieces = this.pieces[this.turn.number];
+    for (var i = 0; i < pieces.length; i++) {
+        if (pieces[i].validMoves().jumps.length) {
+            console.log('jumps available:',pieces[i].validMoves().jumps);
+            return true;
+        }
+    }
+
+    return false;
+};
+
 Checkers.prototype.validMove = function (piece, destCol, destRow) {
     var moves = piece.validMoves().moves;
+    console.log('valid moves', moves);
+    console.log('attempt:', destCol, destRow);
 
     for (var i = 0; i < moves.length; i++) {
-        if (moves[0] === destCol &&
-            moves[1] === destRow)
+        if (moves[i][0] === destCol &&
+            moves[i][1] === destRow)
             return true;
     }
 
@@ -151,9 +176,13 @@ Checkers.prototype.validMove = function (piece, destCol, destRow) {
 Checkers.prototype.validJump = function (piece, destCol, destRow) {
     var jumps = piece.validMoves().jumps;
 
-    for (var i = 0; i < moves.length; i++) {
-        if (jumps[0] === destCol &&
-            jumps[1] === destRow)
+    console.log('valid jumps', jumps);
+    console.log('attempt:', destCol, destRow);
+
+
+    for (var i = 0; i < jumps.length; i++) {
+        if (jumps[i][0] === destCol &&
+            jumps[i][1] === destRow)
             return true;
     }
 
@@ -165,17 +194,17 @@ Checkers.prototype.movePiece = function (piece, destCol, destRow) {
     piece.column = destCol;
     piece.row = destRow;
     this.board[piece.column][piece.row] = piece;
-    piece.validMovesCache = null;
 };
 
 Checkers.prototype.jumpPiece = function (piece, destCol, destRow) {
     this.board[piece.column][piece.row] = null;
-    var jumpedCol = piece.column + destCol / 2;
-    var jumpedRow = piece.row + destRow / 2;
+    var jumpedCol = (piece.column + destCol) / 2;
+    var jumpedRow = (piece.row + destRow) / 2;
     piece.column = destCol;
     piece.row = destRow;
     this.board[piece.column][piece.row] = piece;
-    piece.validMovesCache = null;
+
+    console.log('jumped', jumpedCol, jumpedRow);
 
     this.removePiece(this.board[jumpedCol][jumpedRow]);
 };
@@ -189,46 +218,43 @@ function Piece (column, row, player, game) {
 }
 
 Piece.prototype.validMoves = function () {
-    if (this.validMovesCache) {
-        return this.validMovesCache;
-    }
-
     var piece = this;
     var moves = [];
     var jumps = [];
 
     [1, -1].forEach(function (northSouth) {
-        if (piece.player == 1 && northSouth == 1 ||
-            piece.player == 2 && northSouth == -1 ||
+        if (piece.player === 1 && northSouth === 1 ||
+            piece.player === 2 && northSouth === -1 ||
             piece.king) {
             [1, -1].forEach(function (eastWest) {
                 var destCol = piece.column + eastWest;
                 var destRow = piece.row + northSouth;
 
                 if (destCol < piece.game.size && destCol >= 0 &&
-                    destRow < piece.game.size && destRow >= 0 &&
-                    !piece.game.board[destCol][destRow]) {
+                    destRow < piece.game.size && destRow >= 0) {
+                    if (!piece.game.board[destCol][destRow]) {
 
-                    moves.push([destCol, destRow])
+                        moves.push([destCol, destRow])
 
-                } else if (piece.game.board[destCol][destRow].player !== piece.player) {
-                    destCol = piece.column + (eastWest * 2);
-                    destRow = piece.row + (northSouth * 2);
+                    } else if (piece.game.board[destCol][destRow] &&
+                        piece.game.board[destCol][destRow].player !== piece.player) {
 
-                    if (destCol < piece.game.size && destCol >= 0 &&
-                        destRow < piece.game.size && destRow >= 0 &&
-                        !piece.game.board[destCol][destRow]) {
+                        var newDestCol = piece.column + (eastWest * 2);
+                        var newDestRow = piece.row + (northSouth * 2);
 
-                        jumps.push([destCol, destRow])
+                        if (newDestCol < piece.game.size && newDestCol >= 0 &&
+                            newDestRow < piece.game.size && newDestRow >= 0 &&
+                            !piece.game.board[newDestCol][newDestRow]) {
+
+                            jumps.push([newDestCol, newDestRow])
+                        }
                     }
                 }
             });
         }
     });
 
-    this.validMovesCache = { jumps: jumps, moves: moves };
-
-    return this.validMovesCache;
+    return { jumps: jumps, moves: moves };
 };
 
 module.exports = Checkers;
