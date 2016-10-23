@@ -68,8 +68,8 @@ a.local-game {
     display: flex;
     flex-direction: row;
     margin: auto;
-    width: 35vw;
-    height: 35vw;
+    width: 30vw;
+    height: 30vw;
     max-width: 1200px;
     background-color: #a3abb6;
     border: 10px solid #555;
