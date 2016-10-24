@@ -1,6 +1,6 @@
 function Checkers (size, rows) {
-    this.size = 8;
-    this.rows = 3;
+    this.size = size || 8;
+    this.rows = rows || 3;
 
     this.winner = null;
     this.state = 'waiting';
